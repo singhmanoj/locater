@@ -1,1 +1,1 @@
-from . import locaterview
+from locaterview import *

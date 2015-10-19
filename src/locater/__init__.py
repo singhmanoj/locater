@@ -7,7 +7,7 @@ import configurations
 
 app = None
 admin = Admin()
-celery_object = Celery()
+celery = None
 config_name = os.environ.get('locater_CONFIG_NAME', 'Development')
 config_class = getattr(configurations, config_name)
 connect(config_class.MONGODB_HOST['DB'], host='mongodb://%(host)s:%(port)s/%(DB)s' % config_class.MONGODB_HOST)
@@ -30,12 +30,11 @@ def create_app(package_name='locater'):
     #     app.jinja_loader,
     #     jinja2.FileSystemLoader('locater/templates/'),
     # ])
-
-
+    global celery
+    celery = create_celery_app(app)
+    from locater.views import CityVerifyView
+    CityVerifyView.register(app)
     admin.init_app(app)
-    from locater.views.locaterview import SpecView
-    SpecView.register(app)
-
     return app
 
 def create_celery_app(app=None):
@@ -52,6 +51,3 @@ def create_celery_app(app=None):
                 return TaskBase.__call__(self, *args, **kwargs)
     celery.Task = ContextTask
     return celery
-
-
-from locater import views

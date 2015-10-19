@@ -39,12 +39,16 @@ class HospitalData(db.Document):
     name = db.StringField(required=True)
     google_place_id = db.StringField(required=True, unique=True)
     point = db.GeoPointField(required=True)
-    vicinity = db.StringField(required=True)
+    address = db.StringField()
+    phone_no = db.StringField()  # To get the phone no.
     created_on = db.DateTimeField(default=datetime.datetime.now)
     modified_on = db.DateTimeField(default=datetime.datetime.now)
     is_verified = db.BooleanField(default=False)
     is_active = db.BooleanField(default=True)
     city = db.ReferenceField(City)
+    # This is temporary fields to get Phone No
+    is_processing = db.BooleanField(default=False)
+    is_processed = db.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         self.modified_on = datetime.datetime.now()  # To save the modified on
@@ -54,10 +58,10 @@ class HospitalData(db.Document):
 class CrawlData(db.Document): # For the temporary data
     '''Crawling in the grid state step can be reduced if required
     '''
-    point = db.GeoPointField(required=True, unique=True)
+    point = db.GeoPointField(required=True)
     created_on = db.DateTimeField(default=datetime.datetime.now)
     modified_on = db.DateTimeField(default=datetime.datetime.now)
-    processed = db.BooleanField(default=False)
+    is_processed = db.BooleanField(default=False)
     is_processing = db.BooleanField(default=False)  # for the worker
     city = db.ReferenceField(City)
     type = db.StringField(required=True)  # This is created automatically and it should be define in the setting file

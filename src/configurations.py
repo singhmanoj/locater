@@ -11,7 +11,7 @@ class Base(object):
     SECRET_KEY = 'the-secret-key-is-not-here'
     CELERY_IMPORTS = ['locater.tasks']
     CSRF_ENALED = True
-    GOOGLE_API_CITY = 'https://maps.googleapis.com/maps/api/geocode/json?key=%(key)s'  # Limit 2500 Request/Day
+    GOOGLE_API_CITY = 'https://maps.googleapis.com/maps/api/geocode/json?key=%(key)s&address=%(address)s'  # Limit 2500 Request/Day
     GOOGLE_API_PLACES = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=%(location)s&rankby=distance&types=%(type)s&key=%(key)s'  # Limit 1000 Request/Day
     GOOGLE_API_PLACE_DETAILS = 'https://maps.googleapis.com/maps/api/place/details/json?placeid=%(google_place_id)s&key=%(key)s'
     STEP_DEGREE = 0.1  # LAT = 11.123KM and For LONG = 8.657  For Both apply pythagorus theorem # To make rectangular boundary

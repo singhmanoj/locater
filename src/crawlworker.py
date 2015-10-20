@@ -53,7 +53,6 @@ def defer_task(mongoinstance, email):
                     yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'processed': False}}, upsert=False)
 
         elif content['status'] == 'OVER_QUERY_LIMIT':
-            yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'processed': False}}, upsert=False)
             yield collection_email.update_one({'_id': email['_id']}, {'$set': {'is_limit': True}}, upsert=False)
         elif content['status'] == 'ZERO_RESULTS':
             yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'processed': True}}, upsert=False)

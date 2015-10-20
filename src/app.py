@@ -1,4 +1,4 @@
-from locater import create_app, create_celery_app
+from locater import create_app
 
 app = create_app()
 from locater import celery

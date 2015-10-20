@@ -32,8 +32,13 @@ def create_app(package_name='locater'):
     # ])
     global celery
     celery = create_celery_app(app)
-    from locater.views import CityVerifyView
+    from locater.views import CityVerifyView, CityView, CitySearchView
     CityVerifyView.register(app)
+    CityView.register(app)
+    CitySearchView.register(app)
+    from locater.views import HospitalDataView, HospitalVerifyView
+    HospitalDataView.register(app)
+    HospitalVerifyView.register(app)
     admin.init_app(app)
     return app
 

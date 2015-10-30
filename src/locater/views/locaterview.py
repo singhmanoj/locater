@@ -32,7 +32,8 @@ class CitySearchView(FlaskView):
             response = requests.get(url)
             assert response.status_code == 200, 'Google Request Failed :: ' + url
             content = response.json()
-            if content == 'OK':
+            print content
+            if content['status'] == 'OK':
                 # Good extract results
                 response_dict['data'] = []
                 for result in content['results']:
@@ -41,37 +42,36 @@ class CitySearchView(FlaskView):
                     else:
                         bounds = 'viewport'  # Not a good approach but can be modify
                     formated_data = {
-                        'google_place_id': content['place_id'],
-                        'name': 'formatted_address',
+                        'google_place_id': result['place_id'],
+                        'name': result['formatted_address'],
                         'point': [
-                            content['geometry']['location']['lat'],
-                            content['geometry']['location']['lng'],
+                            result['geometry']['location']['lat'],
+                            result['geometry']['location']['lng'],
                         ],
                         'southwest': [
-                            content['geometry'][bounds]['southwest']['lat'],
-                            content['geometry'][bounds]['southwest']['lng'],
+                            result['geometry'][bounds]['southwest']['lat'],
+                            result['geometry'][bounds]['southwest']['lng'],
                         ],
                         'northeast': [
-                            content['geometry'][bounds]['northeast']['lat'],
-                            content['geometry'][bounds]['northeast']['lng'],
+                            result['geometry'][bounds]['northeast']['lat'],
+                            result['geometry'][bounds]['northeast']['lng'],
                         ]
                     }
-                    response_dict['data'].append(data)
+                    response_dict['data'].append(formated_data)
                 response_dict['message'] = 'Cities Found on Google'
-                response_dict['data'] = formated_data
                 return Response(dumps(response_dict), status=200, content_type="application/json")
-            elif content == 'ZERO_RESULTS':
+            elif content['status'] == 'ZERO_RESULTS':
                 response_dict['message'] = 'No Cities Found on Google'
                 response_dict['data'] = []
                 return Response(dumps(response_dict), status=200, content_type="application/json")
-            elif content == 'OVER_QUERY_LIMIT':
+            elif content['status'] == 'OVER_QUERY_LIMIT':
                 response_dict['message'] = 'Email exceed the limit'
                 email.is_limit = True
                 email.save()
                 response_dict['data'] = []
                 return Response(dumps(response_dict), status=200, content_type="application/json")
             else:
-                response_dict['message'] = 'Problem with the api hit to google'
+                response_dict['message'] = 'Problem with the api hit to google' + json.dumps(content)
                 response_dict['data'] = []
                 return Response(dumps(response_dict), status=500, content_type="application/json")
         except KeyError, excp:

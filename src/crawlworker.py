@@ -37,9 +37,10 @@ def defer_task(mongoinstance, email):
         content = yield response.content()
         content = json.loads(content)
         if content['status'] == 'OK':
-            processed_response(content)
-            yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'processed': True}}, upsert=False)
+            processed_response(content, mongoinstance)
+            yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'is_processed': True}}, upsert=False)
             while 'next_page_token' in content.keys():
+                yield sleep(5)  #sleep for next few seconds
                 temp_url = url + '&pagetoken=%s' % content['next_page_token']
                 response = yield treq.get(str(temp_url))
                 assert response.code == 200, 'Fetching Data is Failed with PageToken'
@@ -47,15 +48,16 @@ def defer_task(mongoinstance, email):
                 content = json.loads(content)
                 if content['status'] == 'OK':
                     # process request
-                    processed_response(content)
+                    processed_response(content, mongoinstance)
                 else:
                     # This request is not processed
-                    yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'processed': False}}, upsert=False)
+                    print 'LOG ERROR:: pagetoken call is failed' + json.dumps(content)
+                    yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'is_processed': False}}, upsert=False)
 
         elif content['status'] == 'OVER_QUERY_LIMIT':
             yield collection_email.update_one({'_id': email['_id']}, {'$set': {'is_limit': True}}, upsert=False)
         elif content['status'] == 'ZERO_RESULTS':
-            yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'processed': True}}, upsert=False)
+            yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'is_processed': True}}, upsert=False)
         else:
             print 'LOG ERROR status 200::', content['status'], url
 
@@ -70,16 +72,22 @@ def defer_task(mongoinstance, email):
 def append_task():
     mongo = yield get_connection()
     collection = mongo.locater.crawl_data
-    active_task = yield collection.find({'is_processing': True, 'processed': False})
+    active_task = yield collection.find({'is_processing': True, 'is_processed': False})
     for i in xrange(config_class.TASK_LIMIT - len(active_task)):
-        mongoinstance = yield collection.find_one({'is_processing': False, 'processed': False})
+        mongoinstance = yield collection.find_one({'is_processing': False, 'is_processed': False})
         email = yield get_email()
         if mongoinstance and email:
+            print 'LOG INFO:: Task Added'
             semaphore.run(defer_task, mongoinstance, email)
             yield collection.update_one({'_id': mongoinstance['_id']}, {'$set': {'is_processing': True}}, upsert=False)
     print len(active_task)
 
-def processed_response(content):
+def sleep(secs):
+    d = defer.Deferred()
+    reactor.callLater(secs, d.callback, None)
+    return d
+
+def processed_response(content, mongoinstance):
     for result in content['results']:
         try:
             data = {
@@ -89,7 +97,8 @@ def processed_response(content):
                 'point': [
                     result['geometry']['location']['lat'],
                     result['geometry']['location']['lng']
-                ]
+                ],
+                'city': mongoinstance['city']
             }
             try:
                 hospital = HospitalData.objects.get(google_place_id=data['google_place_id'])

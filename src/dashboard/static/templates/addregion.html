@@ -1,0 +1,40 @@
+<div ng-controller="searchCityController">
+<input type="text" ng-model="citysearchbox" placeholder="City Search">
+<input type="button" value="Search" ng-click="searchRegion()">
+
+<table ng-show="showData" width="80%">
+    <th>
+        Google Id
+    </th>
+    <th>
+        Name of City
+    </th>
+    <th>
+        Point
+    </th>
+    <th>
+        NorthEast Point
+    </th>
+    <th>
+        SouthWest Point
+    </th>
+    <tr ng-repeat ='result in results'>
+        <td>
+            {{ result.google_place_id }}
+        </td>
+        <td>
+            {{ result.name }}
+        </td>
+        <td>
+            [{{ result.point[0] }}, {{ result.point[1] }}]
+        </td>
+        <td>
+            [{{ result.northeast[0] }}, {{ result.northeast[1] }}]
+        </td>
+        <td>
+            [{{ result.southwest[0] }}, {{ result.southwest[1] }}]
+        </td>
+    </tr>
+</table>
+<div ng-show="results.length == 0">No items found</div>
+</div>

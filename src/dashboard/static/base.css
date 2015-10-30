@@ -1,0 +1,50 @@
+.logo {
+    background: url("image/logo.png") no-repeat  scroll center 10px #246989;
+    color: #fff;
+    display: block;
+    font-size: 1.52em;
+    margin: -5px -5px 0;
+    padding: 45px 0 8px;
+    text-align: center;
+    width: 20%;
+}
+.fronttext {
+    background-color: darkred;
+    color: white;
+    display: block;
+    font-family: "Courier";
+    font-size: large;
+    text-align: center;
+    width: 80%;
+}
+
+.header img {
+    float: left;
+    width: 100px;
+    height: 100px;
+    background: palegreen;
+}
+
+.header h1 {
+    background-color: palegreen;
+    font-family: 'Ubuntu', 'Lucida Grande', 'Lucida Sans Unicode', 'Geneva', 'Verdana', sans-serif;
+    color: white;
+    overflow: auto;
+    position: relative;
+    text-align: end;
+    height: 100px;
+}
+
+.menu ul {
+    float: left;
+    width: 200px;
+    height: 1000px;
+    background-color: aliceblue;
+}
+
+.menu div
+{
+    float: right;
+    color: black;
+    position: relative;
+}

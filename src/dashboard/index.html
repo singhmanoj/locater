@@ -9,26 +9,25 @@
     <script src="static/js/app.js" type="text/javascript"></script>
     <script src="static/js/locaterjsUtils.js" type="text/javascript"></script>
     <link rel="stylesheet" href="static/base.css" type="text/css" >
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </head>
 <body>
 <div class="header">
 <img src="static/image/logo.png" alt="logo">
     <h1>Locater Dashboard</h1>
 </div>
-<div class="menu">
-    <ul>
-        <li >
-            <a href="/#/first">Add Region Search</a>
+    <ul class="nav nav-tabs">
+        <li class="active">
+            <a href="/#/addregion">Add Region Search</a>
         </li>
         <li>
-            Verify Hospital Data
+            <a href="/#/first"> Verify Hospital Data</a>
         </li>
         <li>
-            Add Email I'd
+            <a href="/#/first"> Add Email I'd </a>
         </li>
     </ul>
     <div id="view" ng-view>
     </div>
-</div>
 </body>
 </html>

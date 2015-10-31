@@ -34,6 +34,9 @@
         <td>
             [{{ result.southwest[0] }}, {{ result.southwest[1] }}]
         </td>
+        <td>
+            <input type="button"  ng-click="selectCity(result)" value="Select City">
+        </td>
     </tr>
 </table>
 <div ng-show="results.length == 0">No items found</div>

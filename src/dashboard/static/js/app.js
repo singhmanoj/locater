@@ -16,6 +16,12 @@ var app = angular.module("locaterApp", ["ngRoute"]).
                 controller: searchCityController
 
             }
+        ).otherwise(
+            {
+                templateUrl: "/static/templates/addregion.html",
+                controller: searchCityController
+
+            }
         );
     }
 ]);
@@ -30,6 +36,10 @@ var searchCityController = function($scope, $http){
         if ($scope.citysearchbox != "") {
             searchRegion($scope, $http)
         }
+    }
+    $scope.selectCity = function (data){
+        console.log(data.name)
+        console.log(data.point[0])
 
     }
 }

@@ -3,10 +3,10 @@ import mongoengine as db
 
 class City(db.Document):
     name = db.StringField(required=True)
-    google_place_id = db.StringField(required=True, unique=True)
-    southwest = db.GeoPointField(required=True)
-    northeast = db.GeoPointField(required=True)
-    point = db.GeoPointField(required=True)
+    google_place_id = db.StringField(unique=True)
+    southwest = db.GeoPointField()
+    northeast = db.GeoPointField()
+    point = db.GeoPointField()
     created_on = db.DateTimeField(default=datetime.datetime.now)
     modified_on = db.DateTimeField(default=datetime.datetime.now)
     is_verified = db.BooleanField(default=False)
@@ -34,13 +34,45 @@ class EmailSet(db.Document):
     google_key = db.StringField(required=True)
     is_active = db.BooleanField(default=True)
 
+class Qualification(db.EmbeddedDocument):
+    college = db.StringField()
+    degree = db.StringField()
+    completion_year = db.StringField()
+
+
+class Availability(db.EmbeddedDocument):
+    day = db.StringField()
+    first_half_start_time = db.StringField()
+    first_half_end_time = db.StringField()
+    second_half_start_time = db.StringField()
+    second_half_end_time = db.StringField()
+
+
+class Specialty(db.EmbeddedDocument):
+    specialty = db.StringField()
+    sub_specialty = db.StringField()
+    type = db.StringField()
+
+class Doctors(db.EmbeddedDocument):
+    doctor_name = db.StringField()
+    summary = db.StringField()
+    qualifications = db.EmbeddedDocumentListField(Qualification)
+    is_local = db.BooleanField(default=True)
+    is_male = db.BooleanField()
+    available = db.EmbeddedDocumentListField(Availability)
+    consultation_fee = db.FloatField()
+    practice_time = db.IntField()
+    specialties = db.EmbeddedDocumentListField(Specialty)
+
 
 class HospitalData(db.Document):
     name = db.StringField(required=True)
-    google_place_id = db.StringField(required=True, unique=True)
+    google_place_id = db.StringField(unique=True)
+    s_id = db.StringField(unique=True)
     point = db.GeoPointField(required=True)
     address = db.StringField()
     phone_no = db.StringField()  # To get the phone no.
+    doctors = db.EmbeddedDocumentListField(Doctors)
     created_on = db.DateTimeField(default=datetime.datetime.now)
     modified_on = db.DateTimeField(default=datetime.datetime.now)
     is_verified = db.BooleanField(default=False)
@@ -69,5 +101,4 @@ class CrawlData(db.Document): # For the temporary data
 
     def save(self, *args, **kwargs):
         self.modified_on = datetime.datetime.now()  # To save the modified on
-
         super(CrawlData, self).save(*args, **kwargs)

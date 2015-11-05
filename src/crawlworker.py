@@ -7,7 +7,7 @@ import os
 import treq
 import random
 # sync things
-from locater.models import HospitalData
+from locater.models import GoogleHospitalData
 from mongoengine import DoesNotExist
 import json
 
@@ -95,15 +95,15 @@ def processed_response(content, mongoinstance):
                 'name': result['name'],
                 'address': result['vicinity'],
                 'point': [
-                    result['geometry']['location']['lat'],
-                    result['geometry']['location']['lng']
+                    result['geometry']['location']['lng'],
+                    result['geometry']['location']['lat']
                 ],
                 'city': mongoinstance['city']
             }
             try:
-                hospital = HospitalData.objects.get(google_place_id=data['google_place_id'])
+                hospital = GoogleHospitalData.objects.get(google_place_id=data['google_place_id'])
             except DoesNotExist, e:
-                hospital = HospitalData(**data)
+                hospital = GoogleHospitalData(**data)
                 hospital.save()
         except Exception, e:
             print 'LOG ERROR::Processing Request:', str(e)

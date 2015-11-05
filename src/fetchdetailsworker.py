@@ -7,7 +7,7 @@ import os
 import treq
 import random
 # sync things
-from locater.models import HospitalData
+from locater.models import GoogleHospitalData
 from mongoengine import DoesNotExist
 import json
 
@@ -22,7 +22,7 @@ def defer_task(mongoinstance, email):
     print mongoinstance, email
     try:
         mongo = yield get_connection()
-        collection = mongo.locater.hospital_data
+        collection = mongo.locater.google_hospital_data
         collection_email = mongo.locater.email_set
         # get email
         url_params = {
@@ -56,7 +56,7 @@ def defer_task(mongoinstance, email):
 @defer.inlineCallbacks
 def append_task():
     mongo = yield get_connection()
-    collection = mongo.locater.hospital_data
+    collection = mongo.locater.google_hospital_data
     active_task = yield collection.find({'is_processing': True, 'is_processed': False})
     for i in xrange(config_class.TASK_LIMIT - len(active_task)):
         mongoinstance = yield collection.find_one({'is_processing': False, 'is_processed': False})
@@ -70,12 +70,12 @@ def append_task():
 def processed_response(content):
     for result in content['results']:
         try:
-            hospital = HospitalData.objects.get(google_place_id=['place_id'])
+            hospital = GoogleHospitalData.objects.get(google_place_id=['place_id'])
             hospital.address = result['formatted_address']
             hospital.phone_no = result['formatted_phone_number']
             hospital.point = [
-                    result['geometry']['location']['lat'],
-                    result['geometry']['location']['lng']
+                    result['geometry']['location']['lng'],
+                    result['geometry']['location']['lat']
                 ]
             hospital.name = result['name']
             hospital.save()
@@ -90,7 +90,7 @@ def loop_call():
 def get_connection():
     global mongo
     try:
-        yield mongo.locater.hospital_data.find()
+        yield mongo.locater.google_hospital_data.find()
     except:
         mongo = yield MongoConnection(
             host=config_class.MONGODB_HOST['host'],

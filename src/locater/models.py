@@ -1,17 +1,25 @@
 import datetime
 import mongoengine as db
 
+
 class City(db.Document):
-    name = db.StringField(required=True)
-    google_place_id = db.StringField(unique=True)
-    southwest = db.GeoPointField()
-    northeast = db.GeoPointField()
-    point = db.GeoPointField()
+    '''The City data
+    '''
+    name = db.StringField(required=True, unique=True)
+    google_place_id = db.StringField(unique=True, sparse=True)
+    southwest = db.PointField()
+    northeast = db.PointField()
+    point = db.PointField()
     created_on = db.DateTimeField(default=datetime.datetime.now)
     modified_on = db.DateTimeField(default=datetime.datetime.now)
     is_verified = db.BooleanField(default=False)
     is_active = db.BooleanField(default=True)
+    country = db.StringField(default='India')
     step_degree = db.FloatField()
+    # This is temporary fields to get Phone No
+    is_processing = db.BooleanField(default=False)
+    is_processed = db.BooleanField(default=False)
+
 
 
     def save(self, *args, **kwargs):
@@ -61,18 +69,39 @@ class Doctors(db.EmbeddedDocument):
     is_male = db.BooleanField()
     available = db.EmbeddedDocumentListField(Availability)
     consultation_fee = db.FloatField()
-    practice_time = db.IntField()
+    practice_exp = db.IntField()
     specialties = db.EmbeddedDocumentListField(Specialty)
 
 
 class HospitalData(db.Document):
     name = db.StringField(required=True)
-    google_place_id = db.StringField(unique=True)
-    s_id = db.StringField(unique=True)
-    point = db.GeoPointField(required=True)
+    google_place_id = db.StringField(unique=True, sparse=True)
+    s_id = db.IntField(unique=True, required=True)
+    point = db.PointField(required=True)
     address = db.StringField()
     phone_no = db.StringField()  # To get the phone no.
     doctors = db.EmbeddedDocumentListField(Doctors)
+    created_on = db.DateTimeField(default=datetime.datetime.now)
+    modified_on = db.DateTimeField(default=datetime.datetime.now)
+    is_verified = db.BooleanField(default=False)
+    is_active = db.BooleanField(default=True)
+    city = db.ReferenceField(City)
+    # This is temporary fields to get Phone No
+    last_time_checked = db.DateTimeField(default=datetime.datetime.now)
+    is_processing = db.BooleanField(default=False)
+    is_processed = db.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.modified_on = datetime.datetime.now()  # To save the modified on
+        super(HospitalData, self).save(*args, **kwargs)
+
+
+class GoogleHospitalData(db.Document):
+    name = db.StringField(required=True)
+    google_place_id = db.StringField(unique=True, sparse=True)
+    point = db.PointField(required=True)
+    address = db.StringField()
+    phone_no = db.StringField()  # To get the phone no.
     created_on = db.DateTimeField(default=datetime.datetime.now)
     modified_on = db.DateTimeField(default=datetime.datetime.now)
     is_verified = db.BooleanField(default=False)
@@ -84,7 +113,7 @@ class HospitalData(db.Document):
 
     def save(self, *args, **kwargs):
         self.modified_on = datetime.datetime.now()  # To save the modified on
-        super(HospitalData, self).save(*args, **kwargs)
+        super(GoogleHospitalData, self).save(*args, **kwargs)
 
 
 class CrawlData(db.Document): # For the temporary data

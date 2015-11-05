@@ -45,16 +45,16 @@ class CitySearchView(FlaskView):
                         'google_place_id': result['place_id'],
                         'name': result['formatted_address'],
                         'point': [
-                            result['geometry']['location']['lat'],
                             result['geometry']['location']['lng'],
+                            result['geometry']['location']['lat']
                         ],
                         'southwest': [
-                            result['geometry'][bounds]['southwest']['lat'],
                             result['geometry'][bounds]['southwest']['lng'],
+                            result['geometry'][bounds]['southwest']['lat']
                         ],
                         'northeast': [
-                            result['geometry'][bounds]['northeast']['lat'],
                             result['geometry'][bounds]['northeast']['lng'],
+                            result['geometry'][bounds]['northeast']['lat']
                         ]
                     }
                     response_dict['data'].append(formated_data)
@@ -132,21 +132,21 @@ class CityView(FlaskView):
 
 
 
-    def put(self, google_place_id):
+    def put(self, name):
         response_dict = {}
         data = request.json
         if not data:
             data = request.form
         try:
             formated_data = {
-                'name': data['name'],
+                'google_place_id': data['google_place_id'],
                 'southwest': data['southwest'],
                 'northeast': data['northeast'],
                 'point': data['point'],
                 'step_degree': data['step_degree'],
                 'is_verified': False
             }
-            city = City.objects.get(google_place_id=google_place_id)
+            city = City.objects.get(name=name)
             for key, value in formated_data.iteritems():
                 setattr(city, key, value)
             city.save()

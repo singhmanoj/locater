@@ -34,7 +34,7 @@ def create_app(package_name='locater'):
     celery = create_celery_app(app)
     from locater.views import CityVerifyView, CityView, CitySearchView
     CityVerifyView.register(app, route_prefix='/api/')
-    CityView.register(app)
+    CityView.register(app, route_prefix='/api/')
     CitySearchView.register(app, route_prefix='/api/')
     from locater.views import HospitalDataView, HospitalVerifyView
     HospitalDataView.register(app, route_prefix='/api/')
